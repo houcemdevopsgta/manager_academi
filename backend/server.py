@@ -293,7 +293,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-async def require_role(roles: List[UserRole]):
+def require_role(roles: List[UserRole]):
     async def role_checker(current_user: Dict = Depends(get_current_user)):
         if current_user['role'] not in [r.value for r in roles]:
             raise HTTPException(status_code=403, detail="Insufficient permissions")
