@@ -62,8 +62,6 @@ services:
     build:
       context: ./frontend
       dockerfile: ../Dockerfile.frontend
-      args:
-        - REACT_APP_BACKEND_URL=${BACKEND_URL:-https://api.yourdomain.com}
     container_name: campus-frontend-prod
     restart: always
     ports:
@@ -73,8 +71,6 @@ services:
       - backend
     networks:
       - campus-network
-    volumes:
-      - ./ssl:/etc/nginx/ssl:ro
     deploy:
       resources:
         limits:
