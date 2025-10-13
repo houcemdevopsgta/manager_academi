@@ -5,13 +5,13 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copier les fichiers de requirements
-COPY backend/requirements.txt .
+COPY requirements.txt .
 
 # Installer les dépendances
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copier le code source
-COPY backend/ .
+COPY . .
 
 # Exposer le port
 EXPOSE 8001
