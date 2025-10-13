@@ -1,0 +1,55 @@
+# Node modules
+node_modules
+frontend/node_modules
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+.venv
+venv
+ENV
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs
+
+# Test
+.pytest_cache
+.coverage
+htmlcov
+
+# Git
+.git
+.gitignore
+
+# Environments
+.env.local
+.env.development
+.env.test
+
+# Build
+frontend/build
+frontend/.cache
+
+# Documentation
+README.md
+DOCS.md

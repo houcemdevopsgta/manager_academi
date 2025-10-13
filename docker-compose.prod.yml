@@ -1,0 +1,117 @@
+version: '3.8'
+
+services:
+  # MongoDB Database avec authentification
+  mongodb:
+    image: mongo:7.0
+    container_name: campus-mongodb-prod
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-changeme}
+      MONGO_INITDB_DATABASE: campus_manager
+    networks:
+      - campus-network
+    command: mongod --auth
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh -u $MONGO_ROOT_USER -p $MONGO_ROOT_PASSWORD --authenticationDatabase admin localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend FastAPI
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: campus-backend-prod
+    restart: always
+    ports:
+      - "8001:8001"
+    environment:
+      - MONGO_URL=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-changeme}@mongodb:27017
+      - DB_NAME=campus_manager
+      - CORS_ORIGINS=${CORS_ORIGINS:-https://yourdomain.com}
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - campus-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/api/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  # Frontend React avec Nginx
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        - REACT_APP_BACKEND_URL=${BACKEND_URL:-https://api.yourdomain.com}
+    container_name: campus-frontend-prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+    networks:
+      - campus-network
+    volumes:
+      - ./ssl:/etc/nginx/ssl:ro
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+  # Service de backup MongoDB (optionnel)
+  mongodb-backup:
+    image: mongo:7.0
+    container_name: campus-backup
+    restart: unless-stopped
+    volumes:
+      - ./backups:/backup
+    environment:
+      - MONGO_ROOT_USER=${MONGO_ROOT_USER:-admin}
+      - MONGO_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-changeme}
+    networks:
+      - campus-network
+    entrypoint: |
+      bash -c '
+        while true; do
+          mongodump --host mongodb --username $$MONGO_ROOT_USER --password $$MONGO_ROOT_PASSWORD --authenticationDatabase admin --out /backup/backup-$$(date +%Y%m%d-%H%M%S)
+          # Garder seulement les 7 derniers backups
+          ls -t /backup | tail -n +8 | xargs -I {} rm -rf /backup/{}
+          sleep 86400  # Backup quotidien
+        done
+      '
+
+networks:
+  campus-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
