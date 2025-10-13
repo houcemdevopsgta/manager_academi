@@ -60,8 +60,8 @@ services:
   # Frontend React avec Nginx
   frontend:
     build:
-      context: .
-      dockerfile: Dockerfile.frontend
+      context: ./frontend
+      dockerfile: ../Dockerfile.frontend
       args:
         - REACT_APP_BACKEND_URL=${BACKEND_URL:-https://api.yourdomain.com}
     container_name: campus-frontend-prod
