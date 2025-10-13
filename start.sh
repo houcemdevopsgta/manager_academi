@@ -43,7 +43,7 @@ if ! command -v docker &> /dev/null; then
 fi
 
 # Vérifier si Docker Compose est installé
-if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
+if ! command -v docker compose &> /dev/null && ! docker compose version &> /dev/null; then
     error "Docker Compose n'est pas installé"
     echo "Installez Docker Compose depuis : https://docs.docker.com/compose/install/"
     exit 1
@@ -79,25 +79,25 @@ if [ ! -f "frontend/nginx.conf" ] && [ -f "nginx.conf" ]; then
 fi
 
 # Vérifier si des conteneurs existent déjà
-if docker-compose ps | grep -q "campus"; then
+if docker compose ps | grep -q "campus"; then
     warning "Des conteneurs Campus Manager existent déjà"
     read -p "Voulez-vous les redémarrer ? (o/N) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Oo]$ ]]; then
         info "Redémarrage des conteneurs..."
-        docker-compose restart
+        docker compose restart
         success "Conteneurs redémarrés"
     fi
 else
     # Nettoyer d'abord si nécessaire
     info "Nettoyage des anciens conteneurs..."
-    docker-compose down 2>/dev/null || true
+    docker compose down 2>/dev/null || true
 
     # Construire les images
     info "Construction des images Docker..."
     echo "Cela peut prendre quelques minutes..."
     
-    if docker-compose build --no-cache; then
+    if docker compose build --no-cache; then
         success "Images construites avec succès"
     else
         error "Erreur lors de la construction"
@@ -107,7 +107,7 @@ else
     # Démarrer les services
     info "Démarrage des services..."
     
-    if docker-compose up -d; then
+    if docker compose up -d; then
         success "Services démarrés"
     else
         error "Erreur lors du démarrage"
@@ -121,7 +121,7 @@ sleep 5
 
 # Vérifier l'état
 info "Vérification de l'état des services..."
-docker-compose ps
+docker compose ps
 
 echo ""
 echo -e "${GREEN}╔════════════════════════════════════════╗${NC}"
