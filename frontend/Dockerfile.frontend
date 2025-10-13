@@ -1,13 +1,13 @@
 # Stage 1: Build de l'application React
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copier package.json
-COPY package.json ./
+# Copier package.json + yarn.lock (important pour le cache & la reproductibilité)
+COPY package.json yarn.lock ./
 
-# Installer les dépendances
-RUN yarn install
+# Installer les dépendances (installe devDependencies nécessaires au build)
+RUN yarn install --frozen-lockfile
 
 # Copier le code source
 COPY . .
@@ -29,3 +29,4 @@ EXPOSE 80
 
 # Commande de démarrage
 CMD ["nginx", "-g", "daemon off;"]
+
