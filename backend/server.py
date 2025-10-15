@@ -343,6 +343,25 @@ async def login(credentials: UserLogin):
 async def get_me(current_user: Dict = Depends(get_current_user)):
     return User(**current_user)
 
+# User Management Routes
+@api_router.get("/users", response_model=List[User])
+async def get_users(current_user: Dict = Depends(require_role([UserRole.ADMIN]))):
+    users = await db.users.find({}, {"_id": 0, "password": 0}).to_list(1000)
+    for user in users:
+        if isinstance(user.get('created_at'), str):
+            user['created_at'] = datetime.fromisoformat(user['created_at'])
+    return users
+
+@api_router.patch("/users/{user_id}/status")
+async def update_user_status(user_id: str, is_active: bool, current_user: Dict = Depends(require_role([UserRole.ADMIN]))):
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"is_active": is_active}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "User status updated successfully"}
+
 # Department Routes
 @api_router.post("/departments", response_model=Department)
 async def create_department(dept: DepartmentCreate, current_user: Dict = Depends(require_role([UserRole.ADMIN]))):

@@ -18,6 +18,7 @@ import Attendance from '@/pages/Attendance';
 import Schedules from '@/pages/Schedules';
 import Departments from '@/pages/Departments';
 import Profile from '@/pages/Profile';
+import Users from '@/pages/Users';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
@@ -105,6 +106,7 @@ function App() {
                 <DashboardLayout user={user} onLogout={handleLogout}>
                   <Routes>
                     <Route path="/" element={<Dashboard user={user} />} />
+                    <Route path="/users" element={<Users user={user} />} />
                     <Route path="/students" element={<Students user={user} />} />
                     <Route path="/teachers" element={<Teachers user={user} />} />
                     <Route path="/courses" element={<Courses user={user} />} />

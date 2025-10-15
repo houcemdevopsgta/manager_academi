@@ -56,6 +56,7 @@ const DashboardLayout = ({ children, user, onLogout }) => {
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard, roles: ['admin', 'teacher', 'student'] },
+    { name: 'Utilisateurs', href: '/users', icon: Users, roles: ['admin'] },
     { name: 'Étudiants', href: '/students', icon: Users, roles: ['admin', 'teacher'] },
     { name: 'Enseignants', href: '/teachers', icon: Users, roles: ['admin'] },
     { name: 'Cours', href: '/courses', icon: BookOpen, roles: ['admin', 'teacher', 'student'] },
