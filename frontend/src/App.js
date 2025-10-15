@@ -18,6 +18,7 @@ import Attendance from '@/pages/Attendance';
 import Schedules from '@/pages/Schedules';
 import Departments from '@/pages/Departments';
 import Profile from '@/pages/Profile';
+import Users from '@/pages/Users';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
