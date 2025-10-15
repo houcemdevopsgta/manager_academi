@@ -20,8 +20,15 @@ import Departments from '@/pages/Departments';
 import Profile from '@/pages/Profile';
 import Users from '@/pages/Users';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-export const API = `${BACKEND_URL}/api`;
+const BACKEND_URL =
+  typeof process !== 'undefined' &&
+  process.env.REACT_APP_BACKEND_URL &&
+  process.env.REACT_APP_BACKEND_URL !== 'undefined'
+    ? process.env.REACT_APP_BACKEND_URL.replace(/\/$/, '')
+    : '';
+
+export const API = BACKEND_URL ? `${BACKEND_URL}/api` : '/api';
+
 
 // Axios interceptor for auth
 axios.interceptors.request.use(
