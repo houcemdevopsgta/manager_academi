@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # MongoDB Database
   mongodb:
-    image: mongo:7.0
+    image: mongo:4.4
     container_name: campus-mongodb
     restart: unless-stopped
     ports:
@@ -15,12 +15,11 @@ services:
       MONGO_INITDB_DATABASE: campus_manager
     networks:
       - campus-network
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+     healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.runCommand({ ping: 1 }).ok", "--quiet"]
       interval: 10s
       timeout: 5s
       retries: 5
-
   # Backend FastAPI
   backend:
     build:
@@ -41,7 +40,7 @@ services:
     networks:
       - campus-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8001/api/"]
+      test: ["CMD", "curl", "-f", "http://172.16.180.19:8001/api/"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -60,7 +59,7 @@ services:
     networks:
       - campus-network
     environment:
-      - REACT_APP_BACKEND_URL=http://localhost
+      - REACT_APP_BACKEND_URL=http://172.16.180.19:8001
 
 networks:
   campus-network:
